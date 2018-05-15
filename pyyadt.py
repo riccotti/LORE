@@ -29,14 +29,14 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
         names_file.write('%s%s%s%s%s\n' % (col, sep, col_type, sep, disc_cont))
     names_file.close()
     
-    # cmd = 'yadt/dTcmd -fd %s -fm %s -sep %s -d %s' % (
-    #     data_filename, names_filename, sep, tree_filename)
-    # output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
-    cmd = r"dTcmd -fd %s -fm %s -sep '%s' -d %s" % (
+    cmd = 'yadt/dTcmd -fd %s -fm %s -sep %s -d %s' % (
         data_filename, names_filename, sep, tree_filename)
+    output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
+    # cmd = r"dTcmd -fd %s -fm %s -sep '%s' -d %s" % (
+    #     data_filename, names_filename, sep, tree_filename)
     # cmd = r'noah "%s"' % cmd
     # print(cmd)
-    output = subprocess.check_output(['noah', "%s" % cmd], stderr=subprocess.STDOUT)
+    # output = subprocess.check_output(['noah', "%s" % cmd], stderr=subprocess.STDOUT)
     if log:
         print(cmd)
         print(output)
