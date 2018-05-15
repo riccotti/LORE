@@ -29,12 +29,18 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
         names_file.write('%s%s%s%s%s\n' % (col, sep, col_type, sep, disc_cont))
     names_file.close()
     
-    cmd = 'yadt/dTcmd -fd %s -fm %s -sep %s -d %s' % (
+    # cmd = 'yadt/dTcmd -fd %s -fm %s -sep %s -d %s' % (
+    #     data_filename, names_filename, sep, tree_filename)
+    # output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
+    cmd = r"dTcmd -fd %s -fm %s -sep '%s' -d %s" % (
         data_filename, names_filename, sep, tree_filename)
-    output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
+    # cmd = r'noah "%s"' % cmd
+    # print(cmd)
+    output = subprocess.check_output(['noah', "%s" % cmd], stderr=subprocess.STDOUT)
     if log:
-        print output
-    
+        print(cmd)
+        print(output)
+
     dt = nx.DiGraph(nx.drawing.nx_pydot.read_dot(tree_filename))
     dt_dot = pydotplus.graph_from_dot_data(open(tree_filename, 'r').read())
     
@@ -53,7 +59,7 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
 def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=True):
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
-    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
+    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
     
     y_list = list()
     lf_list = list()
@@ -72,11 +78,11 @@ def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=Tru
 
 
 def get_node_labels(dt):
-    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_node_attributes(dt, 'label').iteritems()}
+    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_node_attributes(dt, 'label').items()}
 
 
 def get_edge_labels(dt):    
-    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_edge_attributes(dt, 'label').iteritems()}
+    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_edge_attributes(dt, 'label').items()}
     
     
 def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isleaf, features_type, discrete, continuous,
@@ -112,7 +118,7 @@ def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isle
                         node = child
                         break
         if count >= n_iter:
-            print 'Loop in Yadt prediction'
+            print('Loop in Yadt prediction')
             return None, None
         count += 1
 
@@ -127,7 +133,7 @@ def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isle
 def predict_rule(dt, x, class_name, features_type, discrete, continuous):
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
-    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
+    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
 
     y, tree_path = predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isleaf, 
                                          features_type, discrete, continuous)
@@ -234,7 +240,7 @@ def yadt_value2type(x, attribute, features_type):
 def get_counterfactuals(dt, tree_path, rule, diff_outcome, class_name, continuous, features_type):
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
-    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
+    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
 
     root = tree_path[0]
 
@@ -280,7 +286,7 @@ def get_falsifeid_conditions(cond, ccond, continuous):
 
     qlen = 0
     fcond = dict()
-    for att, val in ccond.iteritems():
+    for att, val in ccond.items():
         if att not in cond:
             if att in continuous:
                 min_thr, max_thr = ccond[att]
@@ -367,7 +373,7 @@ def expand_rule(rule, continuous):
 def apply_counterfactual(x, delta, continuous, discrete, features_type):
     xcf = cPickle.loads(cPickle.dumps(x))
 
-    for att, val in delta.iteritems():
+    for att, val in delta.items():
         new_val = None
         if att in continuous:
             if '>' in val:

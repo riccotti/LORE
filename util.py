@@ -1,6 +1,6 @@
-import cPickle
 import numpy as np
 import pandas as pd
+import _pickle as cPickle
 
 from sklearn.preprocessing import LabelEncoder
 
@@ -196,7 +196,8 @@ def build_df2explain(bb, X, dataset):
         data_col = data_col.astype(int) if col in discrete else data_col
         data_col = data_col.astype(int) if features_type[col] == 'integer' else data_col
         data.append(data_col)
-    data = map(list, map(None, *data))
+    # data = map(list, map(None, *data))
+    data = [[d[i] for d in data] for i in range(0, len(data[0]))]
     dfZ = pd.DataFrame(data=data, columns=columns)
     dfZ = label_decode(dfZ, discrete, label_encoder)
     return dfZ

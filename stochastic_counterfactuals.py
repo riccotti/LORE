@@ -9,7 +9,7 @@ from scipy.optimize import least_squares
 def apply_counterfactual(x, delta, continuous, discrete):
     xcf = cPickle.loads(cPickle.dumps(x))
 
-    for att, val in delta.iteritems():
+    for att, val in delta.items():
         new_val = None
 
         if att in continuous:
@@ -70,7 +70,7 @@ def get_random_counterfactual(dfx, blackbox, diff_outcome, X2E, class_name, colu
 
     counterfactuals = list()
     counterfactual = dict()
-    for att, val in medoid.iteritems():
+    for att, val in medoid.items():
         if att == class_name:
             continue
         if att in discrete:
@@ -152,7 +152,7 @@ def get_stochastic_counterfactual(dfx, blackbox, X2E, diff_outcome, class_name, 
 
     counterfactuals = list()
     counterfactual = dict()
-    for att, val in medoid.iteritems():
+    for att, val in medoid.items():
         if att == class_name:
             continue
         if att in discrete:

@@ -6,10 +6,10 @@ from gpdatagenerator import calculate_feature_values
 
 
 def explain(idx_record2explain, X2E, dataset, blackbox,
-            ng_function=genetic_neighborhood,
+            ng_function=genetic_neighborhood, #generate_random_data, #genetic_neighborhood, random_neighborhood
             discrete_use_probabilities=False,
             continuous_function_estimation=False,
-            returns_infos=False):
+            returns_infos=False, path='./', sep=';', log=False):
 
     random.seed(0)
     class_name = dataset['class_name']
@@ -21,7 +21,7 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
     possible_outcomes = dataset['possible_outcomes']
 
     # Dataset Preprocessing
-    dataset['feature_values'] = calculate_feature_values(X2E, columns, class_name, discrete, continuous,
+    dataset['feature_values'] = calculate_feature_values(X2E, columns, class_name, discrete, continuous, 1000,
                                                          discrete_use_probabilities, continuous_function_estimation)
 
     dfZ, x = dataframe2explain(X2E, dataset, idx_record2explain, blackbox)
@@ -31,7 +31,7 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
 
     # Build Decision Tree
     dt, dt_dot = pyyadt.fit(dfZ, class_name, columns, features_type, discrete, continuous,
-                            filename=dataset['name'], path='./', sep=';', log=False)
+                            filename=dataset['name'], path=path, sep=sep, log=log)
 
     # Apply Black Box and Decision Tree on instance to explain
     bb_outcome = blackbox.predict(x.reshape(1, -1))[0]
@@ -43,6 +43,10 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
     y_pred_bb = blackbox.predict(Z)
     y_pred_cc, leaf_nodes = pyyadt.predict(dt, dfZ.to_dict('records'), class_name, features_type,
                                            discrete, continuous)
+
+    def predict(X):
+        y, ln, = pyyadt.predict(dt, X, class_name, features_type, discrete, continuous)
+        return y, ln
 
     # Update labels if necessary
     if class_name in label_encoder:
@@ -68,11 +72,51 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
         'dt': dt,
         'tree_path': tree_path,
         'leaf_nodes': leaf_nodes,
-        'diff_outcome': diff_outcome
+        'diff_outcome': diff_outcome,
+        'predict': predict,
     }
 
     if returns_infos:
         return explanation, infos
 
     return explanation
+
+
+def is_satisfied(x, rule, discrete, features_type):
+    for col, val in rule.items():
+        if col in discrete:
+            if str(x[col]).strip() != val:
+                return False
+        else:
+            if '<=' in val and '<' in val and val.find('<=') < val.find('<'):
+                val = val.split(col)
+                thr1 = pyyadt.yadt_value2type(val[0].replace('<=', ''), col, features_type)
+                thr2 = pyyadt.yadt_value2type(val[1].replace('<', ''), col, features_type)
+                # if thr2 < x[col] <= thr1: ok
+                if x[col] > thr1 or x[col] <= thr2:
+                    return False
+            elif '<' in val and '<=' in val and val.find('<') < val.find('<='):
+                val = val.split(col)
+                thr1 = pyyadt.yadt_value2type(val[0].replace('<', ''), col, features_type)
+                thr2 = pyyadt.yadt_value2type(val[1].replace('<=', ''), col, features_type)
+                # if thr2 < x[col] <= thr1: ok
+                if x[col] >= thr1 or x[col] < thr2:
+                    return False
+            elif '<=' in val:
+                thr = pyyadt.yadt_value2type(val.replace('<=', ''), col, features_type)
+                if x[col] > thr:
+                    return False
+            elif '>' in val:
+                thr = pyyadt.yadt_value2type(val.replace('>', ''), col, features_type)
+                if x[col] <= thr:
+                    return False
+    return True
+
+
+def get_covered(rule, X, dataset):
+    covered_indexes = list()
+    for i, x in enumerate(X):
+        if is_satisfied(x, rule, dataset['discrete'], dataset['features_type']):
+            covered_indexes.append(i)
+    return covered_indexes
 
