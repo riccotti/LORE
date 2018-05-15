@@ -11,9 +11,17 @@ warnings.filterwarnings("ignore")
 
 def main():
 
-    dataset_name = 'german_credit.csv'
+    # dataset_name = 'german_credit.csv'
     path_data = '/home/riccardo/Documenti/PhD/OpenTheBlackBox/LORE/datasets/'
-    dataset = prepare_german_dataset(dataset_name, path_data)
+    # dataset = prepare_german_dataset(dataset_name, path_data)
+
+    dataset_name = 'compas-scores-two-years.csv'
+    dataset = prepare_compass_dataset(dataset_name, path_data)
+    print(dataset['label_encoder'][dataset['class_name']].classes_)
+    print(dataset['possible_outcomes'])
+
+    # dataset_name = 'adult.csv'
+    # dataset = prepare_adult_dataset(dataset_name, path_data)
 
     X, y = dataset['X'], dataset['y']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
@@ -22,6 +30,9 @@ def main():
     blackbox.fit(X_train, y_train)
 
     X2E = X_test
+    y2E = blackbox.predict(X2E)
+    y2E = np.asarray([dataset['possible_outcomes'][i] for i in y2E])
+
     idx_record2explain = 0
 
     explanation, infos = lore.explain(idx_record2explain, X2E, dataset, blackbox,
@@ -44,8 +55,12 @@ def main():
     print(len(covered))
     print(covered)
 
-    y2E = blackbox.predict(X2E)
-    precision = [1-np.abs(v-explanation[0][0][dataset['class_name']]) for v in y2E[covered]]
+    print(explanation[0][0][dataset['class_name']], '<<<<')
+
+    def eval(x, y):
+        return 1 if x == y else 0
+
+    precision = [1-eval(v, explanation[0][0][dataset['class_name']]) for v in y2E[covered]]
     print(precision)
     print(np.mean(precision), np.std(precision))
 
