@@ -49,9 +49,15 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
     cmd = 'yadt/dTcmd -fd %s -fm %s -sep %s -d %s' % (
         data_filename, names_filename, sep, tree_filename)
     output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
+    # cmd = r"dTcmd -fd %s -fm %s -sep '%s' -d %s" % (
+    #     data_filename, names_filename, sep, tree_filename)
+    # cmd = r'noah "%s"' % cmd
+    # print(cmd)
+    # output = subprocess.check_output(['noah', "%s" % cmd], stderr=subprocess.STDOUT)
     if log:
-        print output
-    
+        print(cmd)
+        print(output)
+
     dt = nx.DiGraph(nx.drawing.nx_pydot.read_dot(tree_filename))
     dt_dot = pydotplus.graph_from_dot_data(open(tree_filename, 'r').read())
     
@@ -84,7 +90,7 @@ def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=Tru
     """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
-    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
+    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
     
     y_list = list()
     lf_list = list()
@@ -103,48 +109,15 @@ def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=Tru
 
 
 def get_node_labels(dt):
-    """
-
-    Args:
-        dt:
-
-    Returns:
-
-    """
     return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_node_attributes(dt, 'label').iteritems()}
 
 
 def get_edge_labels(dt):    
-    """
-
-    Args:
-        dt:
-
-    Returns:
-
-    """
     return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_edge_attributes(dt, 'label').iteritems()}
     
     
 def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isleaf, features_type, discrete, continuous,
                           n_iter=1000):
-    """
-
-    Args:
-        dt:
-        x:
-        class_name:
-        edge_labels:
-        node_labels:
-        node_isleaf:
-        features_type:
-        discrete:
-        continuous:
-        n_iter:
-
-    Returns:
-
-    """
     root = 'n0'
     node = root
     tree_path = list()
@@ -176,7 +149,7 @@ def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isle
                         node = child
                         break
         if count >= n_iter:
-            print 'Loop in Yadt prediction'
+            print('Loop in Yadt prediction')
             return None, None
         count += 1
 
@@ -189,22 +162,9 @@ def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isle
     
 
 def predict_rule(dt, x, class_name, features_type, discrete, continuous):
-    """
-
-    Args:
-        dt:
-        x:
-        class_name:
-        features_type:
-        discrete:
-        continuous:
-
-    Returns:
-
-    """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
-    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
+    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
 
     y, tree_path = predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isleaf, 
                                          features_type, discrete, continuous)
@@ -217,32 +177,10 @@ def predict_rule(dt, x, class_name, features_type, discrete, continuous):
 
 
 def get_covered_record_index(tree_path, leaf_nodes):
-    """
-
-    Args:
-        tree_path:
-        leaf_nodes:
-
-    Returns:
-
-    """
     return [i for i, l in enumerate(leaf_nodes) if l == tree_path[-1]]
 
 
 def get_rule(tree_path, class_name, y, node_labels=None, edge_labels=None, dt=None):
-    """
-
-    Args:
-        tree_path:
-        class_name:
-        y:
-        node_labels:
-        edge_labels:
-        dt:
-
-    Returns:
-
-    """
     
     if node_labels is None:
         node_labels = get_node_labels(dt)
@@ -321,17 +259,6 @@ def get_rule(tree_path, class_name, y, node_labels=None, edge_labels=None, dt=No
 
 
 def yadt_value2type(x, attribute, features_type):
-    """
-
-    Args:
-        x:
-        attribute:
-        features_type:
-
-    Returns:
-
-    """
-
     if features_type[attribute] == 'integer':
         x = int(float(x))
     elif features_type[attribute] == 'double':
@@ -341,23 +268,9 @@ def yadt_value2type(x, attribute, features_type):
 
 
 def get_counterfactuals(dt, tree_path, rule, diff_outcome, class_name, continuous, features_type):
-    """
-
-    Args:
-        dt:
-        tree_path:
-        rule:
-        diff_outcome:
-        class_name:
-        continuous:
-        features_type:
-
-    Returns:
-
-    """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
-    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
+    node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
 
     root = tree_path[0]
 
@@ -399,21 +312,11 @@ def get_counterfactuals(dt, tree_path, rule, diff_outcome, class_name, continuou
 
 
 def get_falsifeid_conditions(cond, ccond, continuous):
-    """
-
-    Args:
-        cond:
-        ccond:
-        continuous:
-
-    Returns:
-
-    """
     # a condition falsified is not respect or not present in the verified conditions
 
     qlen = 0
     fcond = dict()
-    for att, val in ccond.iteritems():
+    for att, val in ccond.items():
         if att not in cond:
             if att in continuous:
                 min_thr, max_thr = ccond[att]
@@ -507,21 +410,9 @@ def expand_rule(rule, continuous):
 
 
 def apply_counterfactual(x, delta, continuous, discrete, features_type):
-    """
-
-    Args:
-        x:
-        delta:
-        continuous:
-        discrete:
-        features_type:
-
-    Returns:
-
-    """
     xcf = cPickle.loads(cPickle.dumps(x))
 
-    for att, val in delta.iteritems():
+    for att, val in delta.items():
         new_val = None
         if att in continuous:
             if '>' in val:
