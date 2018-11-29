@@ -9,8 +9,7 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
             ng_function=genetic_neighborhood, #generate_random_data, #genetic_neighborhood, random_neighborhood
             discrete_use_probabilities=False,
             continuous_function_estimation=False,
-            returns_infos=False, path='./', sep=';', log=False):
-
+            returns_infos=False):
     random.seed(0)
     class_name = dataset['class_name']
     columns = dataset['columns']
@@ -21,8 +20,9 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
     possible_outcomes = dataset['possible_outcomes']
 
     # Dataset Preprocessing
-    dataset['feature_values'] = calculate_feature_values(X2E, columns, class_name, discrete, continuous, 1000,
-                                                         discrete_use_probabilities, continuous_function_estimation)
+    dataset['feature_values'] = calculate_feature_values(X2E, columns, class_name, discrete, continuous,
+                                                        discrete_use_probabilities=discrete_use_probabilities,
+                                                        continuous_function_estimation=continuous_function_estimation)
 
     dfZ, x = dataframe2explain(X2E, dataset, idx_record2explain, blackbox)
 
