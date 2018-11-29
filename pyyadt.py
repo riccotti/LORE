@@ -14,6 +14,23 @@ from collections import defaultdict
 
 def fit(df, class_name, columns, features_type, discrete, continuous,
         filename='yadt_dataset', path='./', sep=';', log=False):
+    """
+
+    Args:
+        df:
+        class_name:
+        columns:
+        features_type:
+        discrete:
+        continuous:
+        filename:
+        path:
+        sep:
+        log:
+
+    Returns:
+
+    """
     
     data_filename = path + filename + '.data'
     names_filename = path + filename + '.names'
@@ -51,6 +68,20 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
 
 
 def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=True):
+    """
+
+    Args:
+        dt:
+        X:
+        class_name:
+        features_type:
+        discrete:
+        continuous:
+        leafnode:
+
+    Returns:
+
+    """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
     node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
@@ -72,15 +103,48 @@ def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=Tru
 
 
 def get_node_labels(dt):
+    """
+
+    Args:
+        dt:
+
+    Returns:
+
+    """
     return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_node_attributes(dt, 'label').iteritems()}
 
 
 def get_edge_labels(dt):    
+    """
+
+    Args:
+        dt:
+
+    Returns:
+
+    """
     return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_edge_attributes(dt, 'label').iteritems()}
     
     
 def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isleaf, features_type, discrete, continuous,
                           n_iter=1000):
+    """
+
+    Args:
+        dt:
+        x:
+        class_name:
+        edge_labels:
+        node_labels:
+        node_isleaf:
+        features_type:
+        discrete:
+        continuous:
+        n_iter:
+
+    Returns:
+
+    """
     root = 'n0'
     node = root
     tree_path = list()
@@ -125,6 +189,19 @@ def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isle
     
 
 def predict_rule(dt, x, class_name, features_type, discrete, continuous):
+    """
+
+    Args:
+        dt:
+        x:
+        class_name:
+        features_type:
+        discrete:
+        continuous:
+
+    Returns:
+
+    """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
     node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
@@ -140,10 +217,32 @@ def predict_rule(dt, x, class_name, features_type, discrete, continuous):
 
 
 def get_covered_record_index(tree_path, leaf_nodes):
+    """
+
+    Args:
+        tree_path:
+        leaf_nodes:
+
+    Returns:
+
+    """
     return [i for i, l in enumerate(leaf_nodes) if l == tree_path[-1]]
 
 
 def get_rule(tree_path, class_name, y, node_labels=None, edge_labels=None, dt=None):
+    """
+
+    Args:
+        tree_path:
+        class_name:
+        y:
+        node_labels:
+        edge_labels:
+        dt:
+
+    Returns:
+
+    """
     
     if node_labels is None:
         node_labels = get_node_labels(dt)
@@ -222,6 +321,16 @@ def get_rule(tree_path, class_name, y, node_labels=None, edge_labels=None, dt=No
 
 
 def yadt_value2type(x, attribute, features_type):
+    """
+
+    Args:
+        x:
+        attribute:
+        features_type:
+
+    Returns:
+
+    """
 
     if features_type[attribute] == 'integer':
         x = int(float(x))
@@ -232,6 +341,20 @@ def yadt_value2type(x, attribute, features_type):
 
 
 def get_counterfactuals(dt, tree_path, rule, diff_outcome, class_name, continuous, features_type):
+    """
+
+    Args:
+        dt:
+        tree_path:
+        rule:
+        diff_outcome:
+        class_name:
+        continuous:
+        features_type:
+
+    Returns:
+
+    """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
     node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').iteritems()}
@@ -276,6 +399,16 @@ def get_counterfactuals(dt, tree_path, rule, diff_outcome, class_name, continuou
 
 
 def get_falsifeid_conditions(cond, ccond, continuous):
+    """
+
+    Args:
+        cond:
+        ccond:
+        continuous:
+
+    Returns:
+
+    """
     # a condition falsified is not respect or not present in the verified conditions
 
     qlen = 0
@@ -341,6 +474,15 @@ def get_falsifeid_conditions(cond, ccond, continuous):
 
 
 def expand_rule(rule, continuous):
+    """
+
+    Args:
+        rule:
+        continuous:
+
+    Returns:
+
+    """
     erule = dict()
     for sc in rule[1]:
         if sc in continuous:
@@ -365,6 +507,18 @@ def expand_rule(rule, continuous):
 
 
 def apply_counterfactual(x, delta, continuous, discrete, features_type):
+    """
+
+    Args:
+        x:
+        delta:
+        continuous:
+        discrete:
+        features_type:
+
+    Returns:
+
+    """
     xcf = cPickle.loads(cPickle.dumps(x))
 
     for att, val in delta.iteritems():

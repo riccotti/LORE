@@ -10,7 +10,6 @@ def explain(idx_record2explain, X2E, dataset, blackbox,
             discrete_use_probabilities=False,
             continuous_function_estimation=False,
             returns_infos=False):
-
     random.seed(0)
     class_name = dataset['class_name']
     columns = dataset['columns']

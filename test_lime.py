@@ -64,7 +64,7 @@ def main():
         logic_explanation.append(exp.domain_mapper.discretized_feature_names[idx])
 
     for feature, weight in zip(logic_explanation, used_features_importance):
-        print feature, weight
+        print(feature, weight)
 
     # bb_outcome = blackbox.predict(Z[0].reshape(1, -1))[0]
     # cc_outcome = np.round(lr.predict(Zlr[0, used_features_idx].reshape(1, -1))).astype(int)[0]

@@ -33,12 +33,12 @@ def main():
 
     x = build_df2explain(blackbox, X2E[idx_record2explain].reshape(1, -1), dataset).to_dict('records')[0]
 
-    print 'x = %s' % x
-    print 'r = %s --> %s' % (explanation[0][1], explanation[0][0])
+    print('x = %s' % x)
+    print('r = %s --> %s' % (explanation[0][1], explanation[0][0]))
     for delta in explanation[1]:
-        print 'delta', delta
+        print('delta', delta)
 
-    print 'Evaluation',
+    print('Evaluation')
     bb_outcome = infos['bb_outcome']
     cc_outcome = infos['cc_outcome']
     y_pred_bb = infos['y_pred_bb']
@@ -49,8 +49,8 @@ def main():
     leaf_nodes = infos['leaf_nodes']
     diff_outcome = infos['diff_outcome']
 
-    print evaluate_explanation(x, blackbox, dfZ, dt, tree_path, leaf_nodes, bb_outcome, cc_outcome,
-                               y_pred_bb, y_pred_cc, diff_outcome, dataset, explanation[1])
+    print(evaluate_explanation(x, blackbox, dfZ, dt, tree_path, leaf_nodes, bb_outcome, cc_outcome,
+                               y_pred_bb, y_pred_cc, diff_outcome, dataset, explanation[1]))
 
 
 if __name__ == "__main__":

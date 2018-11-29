@@ -1,19 +1,21 @@
-from gpdatagenerator import *
-from distance_functions import *
+from lore.api.src.gpdatagenerator import *
+from lore.api.src.distance_functions import *
 
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import CondensedNearestNeighbour
 
 
-def genetic_neighborhood(dfZ, x, blackbox, dataset):
+def genetic_neighborhood(dfZ, x, blackbox, dataset, population_size=1000):
     discrete = dataset['discrete']
     continuous = dataset['continuous']
     class_name = dataset['class_name']
     idx_features = dataset['idx_features']
     feature_values = dataset['feature_values']
+    neightype = dataset['neighborhood_type']
 
     discrete_no_class = list(discrete)
-    discrete_no_class.remove(class_name)
+    if class_name in discrete_no_class:
+        discrete_no_class.remove(class_name)
 
     def distance_function(x0, x1, discrete, continuous, class_name):
         return mixed_distance(x0, x1, discrete, continuous, class_name,
@@ -21,10 +23,11 @@ def genetic_neighborhood(dfZ, x, blackbox, dataset):
                               cdist=normalized_euclidean_distance)
 
     Z = generate_data(x, feature_values, blackbox, discrete_no_class, continuous, class_name, idx_features,
-                      distance_function, neigtype={'ss': 0.5, 'sd': 0.5}, population_size=1000, halloffame_ratio=0.1,
-                      alpha1=0.5, alpha2=0.5, eta1=1.0, eta2=0.0,  tournsize=3, cxpb=0.5, mutpb=0.2, ngen=10)
-    dfZ = build_df2explain(blackbox, Z, dataset)
-    return dfZ, Z
+                      distance_function, neigtype=neightype, population_size=population_size,
+                      halloffame_ratio=0.1, alpha1=0.5, alpha2=0.5, eta1=1.0, eta2=0.0,  tournsize=3, cxpb=0.5,
+                      mutpb=0.2, ngen=10)
+    # dfZ = build_df2explain(blackbox, Z, dataset)
+    return Z
 
 
 def real_data(dfZ, x, blackbox, dataset):
@@ -85,26 +88,29 @@ def random_neighborhood(dfZ, x, blackbox, dataset, stratified=True):
         Z, _ = label_encode(dfZ, discrete, label_encoder)
         Z = Z.iloc[neig_indexes, Z.columns != class_name].values
         Z = generate_random_data(Z, class_name, columns, discrete, continuous, features_type, size=1000, uniform=True)
-        dfZ = build_df2explain(blackbox, Z, dataset)
+        # dfZ = build_df2explain(blackbox, Z, dataset)
 
-        return dfZ, Z
+        return Z
 
     else:
 
-        Z, _ = label_encode(dfZ, discrete, label_encoder)
-        Z = Z.iloc[:, Z.columns != class_name].values
+        # Z, _ = label_encode(dfZ, discrete, label_encoder)
+        # Z = Z.iloc[:, Z.columns != class_name].values
+        Z = dfZ.values[:, :-1]
         Z = generate_random_data(Z, class_name, columns, discrete, continuous, features_type, size=1000, uniform=True)
-        dfZ = build_df2explain(blackbox, Z, dataset)
+        # dfZ = build_df2explain(blackbox, Z, dataset)
 
-        return dfZ, Z
+        return Z
 
 
 def generate_random_data(X, class_name, columns, discrete, continuous, features_type, size=1000, uniform=True):
-    if isinstance(X, pd.DataFrame):
-        X = X.values
+    # if isinstance(X, pd.DataFrame):
+    #     X = X.values
     X1 = list()
     columns1 = list(columns)
-    columns1.remove(class_name)
+    if class_name in columns1:
+        columns1.remove(class_name)
+
     for i, col in enumerate(columns1):
         values = X[:, i]
         diff_values = np.unique(values)

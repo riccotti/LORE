@@ -79,6 +79,7 @@ def prepare_adult_dataset(filename, path_data):
     y = df_le[class_name].values
 
     dataset = {
+        'name': filename.replace('.csv', ''),
         'df': df,
         'columns': list(columns),
         'class_name': class_name,
@@ -153,6 +154,7 @@ def prepare_compass_dataset(filename, path_data):
     y = df_le[class_name].values
 
     dataset = {
+        'name': filename.replace('.csv', ''),
         'df': df,
         'columns': list(columns),
         'class_name': class_name,
