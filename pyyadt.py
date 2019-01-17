@@ -29,7 +29,7 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
         names_file.write('%s%s%s%s%s\n' % (col, sep, col_type, sep, disc_cont))
     names_file.close()
     
-    cmd = 'yadt/dTcmd -fd %s -fm %s -sep %s -d %s' % (
+    cmd = './dTcmd -fd %s -fm %s -sep %s -d %s' % (
         data_filename, names_filename, sep, tree_filename)
     output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
     # cmd = r"dTcmd -fd %s -fm %s -sep '%s' -d %s" % (
