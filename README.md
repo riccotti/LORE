@@ -6,6 +6,6 @@ This code has been used to carry on the experiemnts of the paper
 > Guidotti, R., Monreale, A., Giannotti, F., Pedreschi, D., Ruggieri, S., & Turini, F. (2019). Factual and counterfactual explanations for black box decision making. IEEE Intelligent Systems, 34(6), 14-23.
 
 We encourage users to rely on the implemenation of LORE availabel here: https://kdd-lab.github.io/LORE_sa/html/index.html
-That is an improved version of the code adopted for the paper
+that is an improved version of the code adopted for the paper
 
 > Guidotti, R., Monreale, A., Ruggieri, S., Naretto, F., Turini, F., Pedreschi, D., & Giannotti, F. (2022). Stable and actionable explanations of black-box models through factual and counterfactual rules. Data Mining and Knowledge Discovery, 1-38.
