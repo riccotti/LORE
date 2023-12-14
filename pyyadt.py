@@ -14,6 +14,23 @@ from collections import defaultdict
 
 def fit(df, class_name, columns, features_type, discrete, continuous,
         filename='yadt_dataset', path='./', sep=';', log=False):
+    """
+
+    Args:
+        df:
+        class_name:
+        columns:
+        features_type:
+        discrete:
+        continuous:
+        filename:
+        path:
+        sep:
+        log:
+
+    Returns:
+
+    """
     
     data_filename = path + filename + '.data'
     names_filename = path + filename + '.names'
@@ -57,6 +74,20 @@ def fit(df, class_name, columns, features_type, discrete, continuous,
 
 
 def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=True):
+    """
+
+    Args:
+        dt:
+        X:
+        class_name:
+        features_type:
+        discrete:
+        continuous:
+        leafnode:
+
+    Returns:
+
+    """
     edge_labels = get_edge_labels(dt)
     node_labels = get_node_labels(dt)
     node_isleaf = {k: v == 'ellipse' for k, v in nx.get_node_attributes(dt, 'shape').items()}
@@ -78,11 +109,11 @@ def predict(dt, X, class_name, features_type, discrete, continuous, leafnode=Tru
 
 
 def get_node_labels(dt):
-    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_node_attributes(dt, 'label').items()}
+    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_node_attributes(dt, 'label').iteritems()}
 
 
 def get_edge_labels(dt):    
-    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_edge_attributes(dt, 'label').items()}
+    return {k: v.replace('"', '').replace('\\n', '') for k, v in nx.get_edge_attributes(dt, 'label').iteritems()}
     
     
 def predict_single_record(dt, x, class_name, edge_labels, node_labels, node_isleaf, features_type, discrete, continuous,
@@ -228,7 +259,6 @@ def get_rule(tree_path, class_name, y, node_labels=None, edge_labels=None, dt=No
 
 
 def yadt_value2type(x, attribute, features_type):
-
     if features_type[attribute] == 'integer':
         x = int(float(x))
     elif features_type[attribute] == 'double':
@@ -347,6 +377,15 @@ def get_falsifeid_conditions(cond, ccond, continuous):
 
 
 def expand_rule(rule, continuous):
+    """
+
+    Args:
+        rule:
+        continuous:
+
+    Returns:
+
+    """
     erule = dict()
     for sc in rule[1]:
         if sc in continuous:
