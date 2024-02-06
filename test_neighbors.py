@@ -45,17 +45,17 @@ def main():
     idx_record2explain = 1
     dfZ, x = dataframe2explain(X2E, dataset, idx_record2explain, blackbox)
 
-    for ng_name, ng_function in neighbor_generator_list.iteritems():
+    for ng_name, ng_function in neighbor_generator_list.items(): #iteritems():
 
-        print 'Neighbor generator: %s' % ng_name
+        print('Neighbor generator: %s' % ng_name)
         dfZ, Z = ng_function(dfZ, x, blackbox, dataset)
 
         class0_count = dfZ[class_name].value_counts().get(0, 0.0)
         class1_count = dfZ[class_name].value_counts().get(1, 0.0)
 
-        print '\tneighbor size: %d' % len(dfZ)
-        print '\tclass 0: %.2f (%d)' % (1.0 * class0_count / len(dfZ), class0_count)
-        print '\tclass 1: %.2f (%d)' % (1.0 * class1_count / len(dfZ), class1_count)
+        print('\tneighbor size: %d' % len(dfZ))
+        print('\tclass 0: %.2f (%d)' % (1.0 * class0_count / len(dfZ), class0_count))
+        print('\tclass 1: %.2f (%d)' % (1.0 * class1_count / len(dfZ), class1_count))
 
 
 if __name__ == "__main__":
